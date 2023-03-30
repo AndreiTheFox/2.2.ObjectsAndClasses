@@ -7,7 +7,7 @@ fun main(args: Array<String>) {
     )
     WallService.add(newPost)
     WallService.add(newPost2)
-    WallService.update(newPost)
+    WallService.update(newPost.copy(id=1))
 }
 
 data class Post(
@@ -29,12 +29,12 @@ data class Post(
     val isPinned: Boolean = false,      //Информация о том, что запись закреплена.(True - закреплена, 0 - нет).
     val markedAsAds: Boolean = false,   //Является ли запись рекламой (True - реклама, 0 - нет).
     val isFavorite: Boolean = false,    //true, если объект добавлен в закладки у текущего пользователя.
-    val comments: comments = comments(),      //Информация о комментариях к записи, класс с полями
-    val copyright: copyright = copyright(),    //Информация об источнике
-    val likes: likes = likes(),
+    val comments: Comments = Comments(),      //Информация о комментариях к записи, класс с полями
+    val copyright: Copyright = Copyright(),    //Информация об источнике
+    val likes: Likes = Likes(),
 )
 
-class comments(
+data class Comments(
     val count: Int = 0,                //Количество комментариев.
     val canPost: Boolean = true,       //Может ли текущий пользователь комментировать запись (True — может, 0 — не может).
     val groupsCanPost: Boolean = true, //Могут ли сообщества комментировать запись (True — может, 0 — не может).
@@ -42,14 +42,14 @@ class comments(
     val canOpen: Boolean = true,       //Может ли текущий пользователь открыть комментарии к записи (True — может, 0 — не может).
 )
 
-class copyright(
+data class Copyright(
     val id: Int = 0,
     val link: String = "",
     val name: String = "",
     val type: String = "",
 )
 
-class likes(
+data class Likes(
     val count: Int = 0,                 // Число пользователей, которым понравилась запись
     val userLikes: Boolean = false,     //Наличие отметки «Мне нравится» от текущего пользователя (True — есть, 0 — нет);
     val canLike: Boolean = true,        //Может ли текущий пользователь поставить отметку «Мне нравится» (1 — может, 0 — не может);
@@ -61,24 +61,13 @@ object WallService {
     private var arrayPostId: Int = 0
     fun add(post: Post): Post {
         arrayPostId += 1
-        val modifiedPost: Post = post.copy(id = post.id + arrayPostId)
-        post.id = modifiedPost.id
+        val modifiedPost: Post = post.copy(id = arrayPostId)
         posts += modifiedPost
         println("В массив добавлен пост: ")
         println(modifiedPost)
         return posts.last()
     }
 
-    /*   fun updateById(id: Int): Boolean {
-           var found = false
-           for ((index, post) in posts.withIndex()) {
-               if (post.id == id) {
-                   println(post)
-                   found = true
-               } else found = false
-           }
-           return found
-       }*/
     fun update(postToUpdate: Post): Boolean {
         var found = false
         for ((index, post) in this.posts.withIndex()) {
@@ -93,6 +82,7 @@ object WallService {
         }
         return found
     }
+
     fun clear() {
         posts = emptyArray()
         var arrayPostId: Int = 0
